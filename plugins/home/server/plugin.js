@@ -1,0 +1,81 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.HomeServerPlugin = void 0;
+
+var _services = require("./services");
+
+var _capabilities_provider = require("./capabilities_provider");
+
+var _saved_objects = require("./saved_objects");
+
+var _routes = require("./routes");
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; } /*
+                                                                                                                                                                                                                   * SPDX-License-Identifier: Apache-2.0
+                                                                                                                                                                                                                   *
+                                                                                                                                                                                                                   * The OpenSearch Contributors require contributions made to
+                                                                                                                                                                                                                   * this file be licensed under the Apache-2.0 license or a
+                                                                                                                                                                                                                   * compatible open source license.
+                                                                                                                                                                                                                   *
+                                                                                                                                                                                                                   * Any modifications Copyright OpenSearch Contributors. See
+                                                                                                                                                                                                                   * GitHub history for details.
+                                                                                                                                                                                                                   */ /*
+                                                                                                                                                                                                                       * Licensed to Elasticsearch B.V. under one or more contributor
+                                                                                                                                                                                                                       * license agreements. See the NOTICE file distributed with
+                                                                                                                                                                                                                       * this work for additional information regarding copyright
+                                                                                                                                                                                                                       * ownership. Elasticsearch B.V. licenses this file to you under
+                                                                                                                                                                                                                       * the Apache License, Version 2.0 (the "License"); you may
+                                                                                                                                                                                                                       * not use this file except in compliance with the License.
+                                                                                                                                                                                                                       * You may obtain a copy of the License at
+                                                                                                                                                                                                                       *
+                                                                                                                                                                                                                       *    http://www.apache.org/licenses/LICENSE-2.0
+                                                                                                                                                                                                                       *
+                                                                                                                                                                                                                       * Unless required by applicable law or agreed to in writing,
+                                                                                                                                                                                                                       * software distributed under the License is distributed on an
+                                                                                                                                                                                                                       * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+                                                                                                                                                                                                                       * KIND, either express or implied.  See the License for the
+                                                                                                                                                                                                                       * specific language governing permissions and limitations
+                                                                                                                                                                                                                       * under the License.
+                                                                                                                                                                                                                       */
+
+class HomeServerPlugin {
+  constructor(initContext) {
+    this.initContext = initContext;
+
+    _defineProperty(this, "tutorialsRegistry", new _services.TutorialsRegistry());
+
+    _defineProperty(this, "sampleDataRegistry", new _services.SampleDataRegistry(this.initContext));
+  }
+
+  setup(core, plugins) {
+    core.capabilities.registerProvider(_capabilities_provider.capabilitiesProvider);
+    core.savedObjects.registerType(_saved_objects.sampleDataTelemetry);
+    const router = core.http.createRouter();
+    (0, _routes.registerRoutes)(router);
+    return {
+      tutorials: { ...this.tutorialsRegistry.setup(core)
+      },
+      sampleData: { ...this.sampleDataRegistry.setup(core, plugins.usageCollection)
+      }
+    };
+  }
+
+  start() {
+    return {
+      tutorials: { ...this.tutorialsRegistry.start()
+      },
+      sampleData: { ...this.sampleDataRegistry.start()
+      }
+    };
+  }
+
+}
+/** @public */
+
+/** @public */
+
+
+exports.HomeServerPlugin = HomeServerPlugin;
